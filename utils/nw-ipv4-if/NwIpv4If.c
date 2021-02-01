@@ -91,55 +91,56 @@ NwRcT nwIpv4IfInitialize(NwIpv4IfT* thiz, NwU8T* device, NwSdpHandleT hSdp, NwU8
   {
     NW_IP_LOG(NW_LOG_LEVEL_ERRO, "%s", strerror(errno));
     NW_ASSERT(0);
-  }
-
-  bzero(&sll, sizeof(sll));
-  bzero(&ifr, sizeof(ifr));
-
-  /* First Get the Interface Index  */
-
-  strncpy((char *)ifr.ifr_name, (const char*)device, IFNAMSIZ);
-
-  if((ioctl(sd, SIOCGIFHWADDR, &ifr)) == -1)
-  {     
-    printf("Error getting Interface hw address!\n");
-    exit(-1);
-  }
-  else
+  } else if (strlen(device) > 0)
   {
-#if 0
-    printf("HW address of interface is: %02x:%02x:%02x:%02x:%02x:%02x\n", 
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[0],
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[1],
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[2],
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[3],
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[4],
-        (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[5]);
-#endif
-    memcpy(pHwAddr, ifr.ifr_hwaddr.sa_data, 6);
-    memcpy(thiz->hwAddr, ifr.ifr_hwaddr.sa_data, 6);
+
+    bzero(&sll, sizeof(sll));
+    bzero(&ifr, sizeof(ifr));
+
+    /* First Get the Interface Index  */
+
+    strncpy((char *)ifr.ifr_name, (const char*)device, IFNAMSIZ);
+
+    if((ioctl(sd, SIOCGIFHWADDR, &ifr)) == -1)
+    {     
+      printf("Error getting Interface hw address!\n");
+      exit(-1);
+    }
+    else
+    {
+  #if 0
+      printf("HW address of interface is: %02x:%02x:%02x:%02x:%02x:%02x\n", 
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[0],
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[1],
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[2],
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[3],
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[4],
+          (unsigned char)ifr.ifr_ifru.ifru_hwaddr.sa_data[5]);
+  #endif
+      memcpy(pHwAddr, ifr.ifr_hwaddr.sa_data, 6);
+      memcpy(thiz->hwAddr, ifr.ifr_hwaddr.sa_data, 6);
+    }
+
+    if((ioctl(sd, SIOCGIFINDEX, &ifr)) == -1)
+    {     
+      printf("Error getting Interface index !\n");
+      exit(-1);
+    }
+
+    thiz->ifindex = ifr.ifr_ifindex;
+
+    /* Bind our raw socket to this interface */
+
+    sll.sll_family        = PF_PACKET;
+    sll.sll_ifindex       = ifr.ifr_ifindex;
+    sll.sll_protocol      = htons(ETH_P_IP);
+
+    if((bind(sd, (struct sockaddr *)&sll, sizeof(sll)))== -1)
+    {
+      printf("Error binding raw socket to interface\n");
+      exit(-1);
+    }
   }
-
-  if((ioctl(sd, SIOCGIFINDEX, &ifr)) == -1)
-  {     
-    printf("Error getting Interface index !\n");
-    exit(-1);
-  }
-
-  thiz->ifindex = ifr.ifr_ifindex;
-
-  /* Bind our raw socket to this interface */
-
-  sll.sll_family        = PF_PACKET;
-  sll.sll_ifindex       = ifr.ifr_ifindex;
-  sll.sll_protocol      = htons(ETH_P_IP);
-
-  if((bind(sd, (struct sockaddr *)&sll, sizeof(sll)))== -1)
-  {
-    printf("Error binding raw socket to interface\n");
-    exit(-1);
-  }
-
   thiz->hRecvSocketIpv4 = sd;
   thiz->hSdp            = hSdp;
 
@@ -153,32 +154,33 @@ NwRcT nwIpv4IfInitialize(NwIpv4IfT* thiz, NwU8T* device, NwSdpHandleT hSdp, NwU8
   {
     NW_IP_LOG(NW_LOG_LEVEL_ERRO, "%s", strerror(errno));
     NW_ASSERT(0);
-  }
-
-  bzero(&sll, sizeof(sll));
-  bzero(&ifr, sizeof(ifr));
-
-  /* First Get the Interface Index  */
-
-  strncpy((char *)ifr.ifr_name, (const char*)device, IFNAMSIZ);
-  if((ioctl(sd, SIOCGIFINDEX, &ifr)) == -1)
-  {     
-    printf("Error getting Interface index !\n");
-    exit(-1);
-  }
-
-  /* Bind our raw socket to this interface */
-
-  sll.sll_family        = PF_PACKET;
-  sll.sll_ifindex       = ifr.ifr_ifindex;
-  sll.sll_protocol      = htons(ETH_P_ARP);
-
-  if((bind(sd, (struct sockaddr *)&sll, sizeof(sll)))== -1)
+  } else if (strlen(device) > 0)
   {
-    printf("Error binding raw socket to interface\n");
-    exit(-1);
-  }
 
+    bzero(&sll, sizeof(sll));
+    bzero(&ifr, sizeof(ifr));
+
+    /* First Get the Interface Index  */
+
+    strncpy((char *)ifr.ifr_name, (const char*)device, IFNAMSIZ);
+    if((ioctl(sd, SIOCGIFINDEX, &ifr)) == -1)
+    {     
+      printf("Error getting Interface index !\n");
+      exit(-1);
+    }
+
+    /* Bind our raw socket to this interface */
+
+    sll.sll_family        = PF_PACKET;
+    sll.sll_ifindex       = ifr.ifr_ifindex;
+    sll.sll_protocol      = htons(ETH_P_ARP);
+
+    if((bind(sd, (struct sockaddr *)&sll, sizeof(sll)))== -1)
+    {
+      printf("Error binding raw socket to interface\n");
+      exit(-1);
+    }
+  }
   thiz->hRecvSocketArp     = sd;
 
   /*
@@ -243,14 +245,16 @@ void NW_EVT_CALLBACK(nwIpv4IfDataIndicationCallback)
 {
   NwRcT         rc;
   NwU8T         ipDataBuf[MAX_IP_PAYLOAD_LEN];
-  NwS32T        bytesRead;
+  NwS32T        bytesRead, localhost = htonl(127 * 256*256*256 + 1);
   NwIpv4IfT* thiz = (NwIpv4IfT*) arg;
 
   bytesRead = recvfrom(thiz->hRecvSocketIpv4, ipDataBuf, MAX_IP_PAYLOAD_LEN , 0, NULL, NULL);
   if(bytesRead > 0)
   {
-    NW_IP_LOG(NW_LOG_LEVEL_DEBG, "Received IP message of length %u", bytesRead);
-    nwLogHexDump((NwU8T*)ipDataBuf, bytesRead);
+    if (bytesRead >= 34 && (memcmp(ipDataBuf + 26, &localhost, sizeof(NwS32T)) || memcmp(ipDataBuf + 30, &localhost, sizeof(NwS32T)))) {
+      NW_IP_LOG(NW_LOG_LEVEL_DEBG, "Received IP message of length %u", bytesRead);
+      nwLogHexDump((NwU8T*)ipDataBuf, bytesRead);
+    }
     rc = nwSdpProcessIpv4DataInd(thiz->hSdp, 0, (ipDataBuf), (bytesRead));
   }
   else

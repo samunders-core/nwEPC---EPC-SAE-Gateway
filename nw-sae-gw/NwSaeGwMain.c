@@ -317,10 +317,7 @@ nwSaeGwInitialize(NwSaeGwT* thiz)
     rc = nwSaeGwDpeCreateGtpuService(thiz->dataPlane.pDpe, thiz->dataPlane.gtpuIpv4Addr);
   }
 
-  if(strlen((const char*)(thiz->dataPlane.sgiNwIfName)) != 0)
-  {
-    rc = nwSaeGwDpeCreateIpv4Service(thiz->dataPlane.pDpe, thiz->dataPlane.sgiNwIfName);
-  }
+  rc = nwSaeGwDpeCreateIpv4Service(thiz->dataPlane.pDpe, thiz->dataPlane.sgiNwIfName);
  
   return rc;
 }

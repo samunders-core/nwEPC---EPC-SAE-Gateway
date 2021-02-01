@@ -334,36 +334,37 @@ nwIpv4ProcessPdu( NwIpv4StackT* thiz,
 
     NwIpv4HdrT *pHdr = (NwIpv4HdrT*) (pdu + 14);
     gPduLen -= 14;
+    if (pHdr->srcAddr != pHdr->dstAddr) { // log only non-localhost traffic
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received IP-PDU : ");
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Version              - %u", (pHdr->ch[0] & 0xf0) >> 4);
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Header Length        - %u", pHdr->ch[0] & 0x0f);
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Protocol             - %u", pHdr->protocol);
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Source IP            - %d.%d.%d.%d", 
+          (pHdr->srcAddr & 0x000000FF),
+          (pHdr->srcAddr & 0x0000FF00) >> 8, 
+          (pHdr->srcAddr & 0x00FF0000) >> 16, 
+          (pHdr->srcAddr & 0xFF000000) >> 24); 
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Destination IP       - %d.%d.%d.%d", 
+          (pHdr->dstAddr & 0x000000FF),
+          (pHdr->dstAddr & 0x0000FF00) >> 8, 
+          (pHdr->dstAddr & 0x00FF0000) >> 16, 
+          (pHdr->dstAddr & 0xFF000000) >> 24); 
 
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received IP-PDU : ");
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Version              - %u", (pHdr->ch[0] & 0xf0) >> 4);
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Header Length        - %u", pHdr->ch[0] & 0x0f);
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Protocol             - %u", pHdr->protocol);
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Source IP            - %d.%d.%d.%d", 
-        (pHdr->srcAddr & 0x000000FF),
-        (pHdr->srcAddr & 0x0000FF00) >> 8, 
-        (pHdr->srcAddr & 0x00FF0000) >> 16, 
-        (pHdr->srcAddr & 0xFF000000) >> 24); 
-    NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Destination IP       - %d.%d.%d.%d", 
-        (pHdr->dstAddr & 0x000000FF),
-        (pHdr->dstAddr & 0x0000FF00) >> 8, 
-        (pHdr->dstAddr & 0x00FF0000) >> 16, 
-        (pHdr->dstAddr & 0xFF000000) >> 24); 
 
+      tunnelEndPointKey.ipv4Addr = (thiz->mode == NW_IPv4_MODE_DOWNLINK ? pHdr->dstAddr : pHdr->srcAddr);
+      pTunnelEndPoint = RB_FIND(NwIpv4TunnelEndPointIdentifierMap, &(thiz->ipv4AddrMap), &tunnelEndPointKey);
 
-    tunnelEndPointKey.ipv4Addr = (thiz->mode == NW_IPv4_MODE_DOWNLINK ? pHdr->dstAddr : pHdr->srcAddr);
-    pTunnelEndPoint = RB_FIND(NwIpv4TunnelEndPointIdentifierMap, &(thiz->ipv4AddrMap), &tunnelEndPointKey);
+      if(pTunnelEndPoint)
+      {
+        NwIpv4MsgHandleT hMsg;
 
-    if(pTunnelEndPoint)
-    {
-      NwIpv4MsgHandleT hMsg;
-
-      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received IP PDU for end-point " NW_IPV4_ADDR " from " NW_IPV4_ADDR, NW_IPV4_ADDR_FORMAT(tunnelEndPointKey.ipv4Addr), NW_IPV4_ADDR_FORMAT(pHdr->srcAddr));
-      rc = nwIpv4SessionSendMsgApiToUlpEntity(pTunnelEndPoint, pHdr, gPduLen);
-    }
-    else
-    {
-      NW_LOG(thiz, NW_LOG_LEVEL_INFO, "Received IP PDU over non-existent tunnel end-point " NW_IPV4_ADDR " from " NW_IPV4_ADDR, NW_IPV4_ADDR_FORMAT(tunnelEndPointKey.ipv4Addr), NW_IPV4_ADDR_FORMAT(pHdr->srcAddr));
+        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received IP PDU for end-point " NW_IPV4_ADDR " from " NW_IPV4_ADDR, NW_IPV4_ADDR_FORMAT(tunnelEndPointKey.ipv4Addr), NW_IPV4_ADDR_FORMAT(pHdr->srcAddr));
+        rc = nwIpv4SessionSendMsgApiToUlpEntity(pTunnelEndPoint, pHdr, gPduLen);
+      }
+      else
+      {
+        NW_LOG(thiz, NW_LOG_LEVEL_INFO, "Received IP PDU over non-existent tunnel end-point " NW_IPV4_ADDR " from " NW_IPV4_ADDR, NW_IPV4_ADDR_FORMAT(tunnelEndPointKey.ipv4Addr), NW_IPV4_ADDR_FORMAT(pHdr->srcAddr));
+      }
     }
   }
   else if(*(NwU16T*)(pdu + 12) == htons(ETH_P_ARP))

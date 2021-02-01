@@ -77,7 +77,7 @@ void NW_EVT_CALLBACK(nwGtpv1uIfDataIndicationCallback)
     NW_GTPV1U_IF_LOG(NW_LOG_LEVEL_DEBG, "Received GTPU message of length %u from "NW_IPV4_ADDR":%u", bytesRead, NW_IPV4_ADDR_FORMAT((peer.sin_addr.s_addr)), ntohs(peer.sin_port));
     nwLogHexDump(udpBuf, bytesRead);
 
-    rc = nwSdpProcessGtpuDataInd(thiz->hSdp, udpBuf, bytesRead, ntohs(peer.sin_port), ntohl(peer.sin_addr.s_addr));
+    rc = nwSdpProcessGtpuDataInd(thiz->hSdp, udpBuf, bytesRead, ntohs(peer.sin_port), peer.sin_addr.s_addr);
   }
   else
   {
