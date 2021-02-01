@@ -1,3 +1,18 @@
+This fork allows single NIC deployment of `nwLteSaeGw`, tested on CentOS 8:
+```
+for t in filter nat mangle raw security; do
+  iptables -t $t -F
+  iptables -t $t -X
+done
+
+sysctl -w net.ipv4.ip_forward=1
+iptables -t nat -A POSTROUTING -o enp0s3 -s 10.66.10.0/24 ! -d 10.66.10.0/24 -j MASQUERADE
+iptables -t mangle -A FORWARD -d 10.66.10.0/24 -j TEE --gateway 10.66.10.0 # duplicate packet after AFTER de-mangling because raw socket sees packets only as they 'arrive'
+iptables -A OUTPUT -d 10.66.10.0/24 -j DROP
+ip link add dummy0 type dummy || true
+ip addr replace 10.66.10.0/24 dev dummy0
+```
+
 
 :: Introduction 
 ==================================================================================
