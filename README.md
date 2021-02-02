@@ -5,12 +5,15 @@ for t in filter nat mangle raw security; do
   iptables -t $t -X
 done
 
-sysctl -w net.ipv4.ip_forward=1
-iptables -t nat -A POSTROUTING -o enp0s3 -s 10.66.10.0/24 ! -d 10.66.10.0/24 -j MASQUERADE
-iptables -t mangle -A FORWARD -d 10.66.10.0/24 -j TEE --gateway 10.66.10.0 # duplicate packet after AFTER de-mangling because raw socket sees packets only as they 'arrive'
-iptables -A OUTPUT -d 10.66.10.0/24 -j DROP
-ip link add dummy0 type dummy || true
-ip addr replace 10.66.10.0/24 dev dummy0
+FWD=net.ipv4.ip_forward=1 && echo "$FWD" > /etc/sysctl.d/98-enable-forwarding.conf && sysctl -w "$FWD"
+nmcli connection modify enp0s3 +IPv4.address 10.66.10.0/24
+ip addr add 10.66.10.0/24 dev enp0s3
+for p in '' '--permanent'; do
+  firewall-cmd $p --direct --add-rule ipv4 nat POSTROUTING 0 -o enp0s3 -s 10.66.10.0/24 ! -d 10.66.10.0/24 -j MASQUERADE
+  firewall-cmd $p --direct --add-rule ipv4 mangle FORWARD 0 -d 10.66.10.0/24 -j TEE --gateway 10.66.10.0 # duplicate packet after AFTER de-mangling because raw socket sees packets only as they 'arrive'
+  firewall-cmd $p --direct --add-rule ipv4 filter FORWARD 0 -d 10.66.10.0/24 -j DROP
+  firewall-cmd $p --add-port=2123/udp --add-port=2152/udp
+done
 ```
 
 
