@@ -258,7 +258,6 @@ typedef struct
 {
   NW_IN    NwU32T                       greKey;
   NW_IN    NwU32T                       ipAddr;
-  NW_IN    NwU16T                       port;
   NW_IN    NwU8T                        flags;
   NW_IN    NwGreMsgHandleT           hMsg;
 } NwGreSendtoInfoT;

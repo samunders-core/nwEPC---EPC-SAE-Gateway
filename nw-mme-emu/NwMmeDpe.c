@@ -256,7 +256,6 @@ nwMmeDpeCreateGtpuIpv4Flow(NwMmeDpeT*   thiz,
   ulpReq.apiInfo.createFlowInfo.hUlpSession   = (NwSdpUlpSessionHandleT) hSession;
 
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.ipv4Addr                = thiz->gtpuIf.ipAddr;
-  ulpReq.apiInfo.createFlowInfo.ingressEndPoint.port                    = 2152;
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowType                = NW_FLOW_TYPE_GTPU;
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowKey.gtpuTeid        = teidIngress;
 
@@ -293,7 +292,6 @@ nwMmeDpeCreateIpv4GtpuFlow(NwMmeDpeT*   thiz,
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowKey.ipv4Addr        = ipv4Ingress;
 
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.ipv4Addr                 = ipv4Egress;
-  ulpReq.apiInfo.createFlowInfo.egressEndPoint.port                     = 2152;
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.flowType                 = NW_FLOW_TYPE_GTPU;
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.flowKey.gtpuTeid         = teidEgress;
 
@@ -324,12 +322,10 @@ nwMmeDpeCreateGtpuGtpuFlow(NwMmeDpeT*   thiz,
   ulpReq.apiInfo.createFlowInfo.hUlpSession   = (NwSdpUlpSessionHandleT) hSession;
 
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.ipv4Addr                = thiz->gtpuIf.ipAddr;
-  ulpReq.apiInfo.createFlowInfo.ingressEndPoint.port                    = 2152;
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowType                = NW_FLOW_TYPE_GTPU;
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowKey.gtpuTeid        = 1234;
 
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.ipv4Addr                 = ipv4Egress;
-  ulpReq.apiInfo.createFlowInfo.egressEndPoint.port                     = 2152;
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.flowType                 = NW_FLOW_TYPE_GTPU;
   ulpReq.apiInfo.createFlowInfo.egressEndPoint.flowKey.gtpuTeid         = teidEgress;
 

@@ -401,7 +401,7 @@ nwGreSendto( NwGreStackT* thiz,  NW_IN NwGreUlpApiT *pUlpReq)
       pMsg->msgBuf,
       pMsg->msgLen,
       pUlpReq->apiInfo.sendtoInfo.ipAddr,
-      pUlpReq->apiInfo.sendtoInfo.port);
+      2152);
 
   NW_LEAVE(thiz);
   return rc;

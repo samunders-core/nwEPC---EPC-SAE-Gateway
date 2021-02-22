@@ -217,7 +217,6 @@ nwMiniUlpTpduSend(NwMiniUlpEntityT* thiz, NwU8T* tpduBuf, NwU32T tpduLen , NwU16
   ulpReq.apiType                        = NW_GRE_ULP_API_SEND_TPDU;
   ulpReq.apiInfo.sendtoInfo.greKey      = fromPort;
   ulpReq.apiInfo.sendtoInfo.ipAddr      = inet_addr(thiz->peerIpStr);
-  ulpReq.apiInfo.sendtoInfo.port        = fromPort;
 
   rc = nwGreGpduMsgNew( thiz->hGreStack,
       NW_FALSE,
