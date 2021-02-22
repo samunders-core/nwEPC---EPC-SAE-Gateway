@@ -1,5 +1,6 @@
 This fork allows single NIC deployment of `nwLteSaeGw`, tested on CentOS 8:
 ```
+# dnf -y install git gcc gcc-c++ libevent-devel make && git clone https://github.com/samunders-core/nwEPC---EPC-SAE-Gateway
 for t in filter nat mangle raw security; do
   iptables -t $t -F
   iptables -t $t -X
