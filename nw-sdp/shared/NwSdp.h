@@ -150,6 +150,7 @@ typedef enum
 typedef struct 
 {
   NwU32T          ipv4Addr;
+  NwU16T          port;
   NwSdpFlowEndPointTypeT  flowType;
 
   union {

@@ -94,6 +94,7 @@ void NW_EVT_CALLBACK(nwSdpUdpDataIndicationCallback)
           ulpReq.apiType                        = NW_GRE_ULP_API_SEND_TPDU;
           ulpReq.apiInfo.sendtoInfo.teid        = thiz->egressEndPoint.flowKey.greKey;
           ulpReq.apiInfo.sendtoInfo.ipAddr      = thiz->egressEndPoint.ipv4Addr;
+          ulpReq.apiInfo.sendtoInfo.port        = thiz->egressEndPoint.port;
 
           rc = nwGreGpduMsgNew( thiz->pStack->hGreStack,
               NW_FALSE,
@@ -125,6 +126,7 @@ void NW_EVT_CALLBACK(nwSdpUdpDataIndicationCallback)
           ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
           ulpReq.apiInfo.sendtoInfo.teid        = thiz->egressEndPoint.flowKey.gtpuTeid;
           ulpReq.apiInfo.sendtoInfo.ipAddr      = thiz->egressEndPoint.ipv4Addr;
+          ulpReq.apiInfo.sendtoInfo.port        = thiz->egressEndPoint.port;
 
         }
         break;
@@ -468,6 +470,7 @@ nwSdpProcessIpv4DataIndication(NwSdpT* thiz,
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
+        ulpReq.apiInfo.sendtoInfo.port        = pFlowContext->egressEndPoint.port;
 
         rc = nwGtpv1uGpduMsgNew( thiz->hGtpv1uStack,
             pFlowContext->egressEndPoint.flowKey.gtpuTeid,      /* TEID                 */
@@ -575,6 +578,7 @@ nwSdpProcessGtpuDataIndication(NwSdpT* thiz,
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
+        ulpReq.apiInfo.sendtoInfo.port        = pFlowContext->egressEndPoint.port;
 
         if(thiz->hGtpv1uStack)
         {

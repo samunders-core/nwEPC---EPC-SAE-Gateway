@@ -224,6 +224,7 @@ nwMiniUlpTpduSend(NwMiniUlpEntityT* thiz, NwU8T* tpduBuf, NwU32T tpduLen , NwU16
   ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
   ulpReq.apiInfo.sendtoInfo.teid        = fromPort;
   ulpReq.apiInfo.sendtoInfo.ipAddr      = inet_addr(thiz->peerIpStr);
+  ulpReq.apiInfo.sendtoInfo.port        = fromPort;
 
   rc = nwGtpv1uGpduMsgNew( thiz->hGtpv1uStack,
       fromPort,
