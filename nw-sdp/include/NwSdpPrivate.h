@@ -102,6 +102,7 @@ typedef struct NwSdp
   NwGreStackHandleT             hGreStack;
   NwIpv4StackHandleT            hIpv4Stack;
   NwU32T                        greSd;
+  NwU16T                        port;
 } NwSdpT; 
 
 /**

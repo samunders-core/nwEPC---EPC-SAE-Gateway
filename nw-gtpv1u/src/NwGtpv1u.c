@@ -431,7 +431,7 @@ nwGtpv1uSendto( NwGtpv1uStackT* thiz,  NW_IN NwGtpv1uUlpApiT *pUlpReq)
 
   rc = nwGtpv1uCreateAndSendMsg(thiz,
       pUlpReq->apiInfo.sendtoInfo.ipAddr,
-      2152,
+	  pUlpReq->apiInfo.sendtoInfo.port,
       (NwGtpv1uMsgT*) (NwGtpv1uMsgT*) pUlpReq->apiInfo.sendtoInfo.hMsg);
 
   NW_LEAVE(thiz);

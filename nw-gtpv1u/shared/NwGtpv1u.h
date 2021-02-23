@@ -258,6 +258,7 @@ typedef struct
 {
   NW_IN    NwU32T                       teid;
   NW_IN    NwU32T                       ipAddr;
+  NW_IN    NwU16T                       port;
   NW_IN    NwU8T                        flags;
   NW_IN    NwGtpv1uMsgHandleT           hMsg;
 } NwGtpv1uSendtoInfoT;

@@ -125,6 +125,7 @@ void NW_EVT_CALLBACK(nwSdpUdpDataIndicationCallback)
           ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
           ulpReq.apiInfo.sendtoInfo.teid        = thiz->egressEndPoint.flowKey.gtpuTeid;
           ulpReq.apiInfo.sendtoInfo.ipAddr      = thiz->egressEndPoint.ipv4Addr;
+          ulpReq.apiInfo.sendtoInfo.port        = 2152;
 
         }
         break;
@@ -464,10 +465,11 @@ nwSdpProcessIpv4DataIndication(NwSdpT* thiz,
       {
         NwGtpv1uUlpApiT           ulpReq;
         NW_ASSERT(pFlowContext->egressEndPoint.ipv4Addr != 0);
-        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR, pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)));
+        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR":%d", pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)), thiz->port);
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
+        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
 
         rc = nwGtpv1uGpduMsgNew( thiz->hGtpv1uStack,
             pFlowContext->egressEndPoint.flowKey.gtpuTeid,      /* TEID                 */
@@ -575,6 +577,7 @@ nwSdpProcessGtpuDataIndication(NwSdpT* thiz,
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
+        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
 
         if(thiz->hGtpv1uStack)
         {
@@ -1290,6 +1293,7 @@ nwSdpProcessGtpuDataInd( NW_IN NwSdpHandleT hSdp,
 
   NW_ASSERT(thiz);
   NW_ENTER(thiz);
+  thiz->port = peerPort;
   rc = nwGtpv1uProcessUdpReq(thiz->hGtpv1uStack, udpData, udpDataLen, peerPort, peerIp);
   NW_LEAVE(thiz);
   return rc;
