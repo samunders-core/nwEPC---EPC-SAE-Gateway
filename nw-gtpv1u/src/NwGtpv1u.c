@@ -450,6 +450,7 @@ static NwGtpv1uRcT
 nwGtpv1uProcessGpdu( NwGtpv1uStackT* thiz, 
                      NW_IN NwCharT* gpdu,
                      NW_IN NwU32T gdpuLen,
+                     NW_IN NwU16T peerPort,
                      NW_IN NwU32T peerIp)
 
 {
@@ -477,7 +478,8 @@ nwGtpv1uProcessGpdu( NwGtpv1uStackT* thiz,
     if(NW_GTPV1U_OK == rc)
     {
       NwGtpv1uMsgT* pMsg = (NwGtpv1uMsgT*) hMsg;
-      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received T-PDU over tunnel end-point '%x' of size %u from "NW_IPV4_ADDR, ntohl(msgHdr->teid), pMsg->msgLen, NW_IPV4_ADDR_FORMAT((peerIp)));
+      NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received T-PDU over tunnel end-point '%x' of size %u from "NW_IPV4_ADDR", storing port %d to session '%x'", ntohl(msgHdr->teid), pMsg->msgLen, NW_IPV4_ADDR_FORMAT((peerIp)), peerPort, pTunnelEndPoint->hUlpSession);
+      ((NwSdpFlowContextT*)pTunnelEndPoint->hUlpSession)->egressPort = peerPort;
       rc = nwGtpSessionSendMsgApiToUlpEntity(pTunnelEndPoint, pMsg);
     }
   }
@@ -766,7 +768,7 @@ nwGtpv1uProcessUdpReq( NW_IN NwGtpv1uStackHandleT hGtpuStackHandle,
       break;
 
     case NW_GTP_GPDU:
-      rc = nwGtpv1uProcessGpdu(thiz, udpData, udpDataLen, peerIp);
+      rc = nwGtpv1uProcessGpdu(thiz, udpData, udpDataLen, peerPort, peerIp);
       break;
 
     default:

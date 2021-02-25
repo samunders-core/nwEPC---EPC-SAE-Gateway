@@ -465,11 +465,11 @@ nwSdpProcessIpv4DataIndication(NwSdpT* thiz,
       {
         NwGtpv1uUlpApiT           ulpReq;
         NW_ASSERT(pFlowContext->egressEndPoint.ipv4Addr != 0);
-        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR":%d", pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)), thiz->port);
+        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR":%d, port restored from session '%x'", pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)), pFlowContext->egressPort, pFlowContext);
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
-        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
+        ulpReq.apiInfo.sendtoInfo.port        = pFlowContext->egressPort;
 
         rc = nwGtpv1uGpduMsgNew( thiz->hGtpv1uStack,
             pFlowContext->egressEndPoint.flowKey.gtpuTeid,      /* TEID                 */
@@ -577,7 +577,7 @@ nwSdpProcessGtpuDataIndication(NwSdpT* thiz,
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
-        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
+        ulpReq.apiInfo.sendtoInfo.port        = pFlowContext->egressPort;
 
         if(thiz->hGtpv1uStack)
         {
@@ -592,7 +592,7 @@ nwSdpProcessGtpuDataIndication(NwSdpT* thiz,
 
           rc = nwGtpv1uMsgDelete(thiz->hGtpv1uStack, (ulpReq.apiInfo.sendtoInfo.hMsg));
           NW_ASSERT( rc == NW_SDP_OK );
-          NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending GTPU PDU over teid 0x%x "NW_IPV4_ADDR, ulpReq.apiInfo.sendtoInfo.teid, NW_IPV4_ADDR_FORMAT(ntohl(ulpReq.apiInfo.sendtoInfo.ipAddr)));
+          NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending GTPU PDU over teid 0x%x "NW_IPV4_ADDR", port %d restored from session '%x'", ulpReq.apiInfo.sendtoInfo.teid, NW_IPV4_ADDR_FORMAT(ntohl(ulpReq.apiInfo.sendtoInfo.ipAddr)), pFlowContext->egressPort, pFlowContext);
         }
         else
         {
