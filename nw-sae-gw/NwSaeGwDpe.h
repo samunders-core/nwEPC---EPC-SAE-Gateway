@@ -101,6 +101,7 @@ nwSaeGwDpeCreateIpv4GtpuFlow(NwSaeGwDpeT*   thiz,
                          NwU32T         teidEgress,
                          NwU32T         ipv4Egress,
                          NwU32T         ipv4Ingress,
+						 NwPtrT         otherDirection,
                          NwU32T         *phBearer);
 
 /**
