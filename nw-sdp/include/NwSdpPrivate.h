@@ -113,7 +113,6 @@ typedef struct NwSdpFlowContext
 {
   NwSdpFlowEndPointT            ingressEndPoint;
   NwSdpFlowEndPointT            egressEndPoint;
-  NwU16T                        egressPort;
   NwU32T                        egressIpv4Addr;                 /**< Egress Ip Address for this session */
   NwSdpT*                       pStack;                         /**< Pointer to the parent stack        */
   NwSdpUlpSessionHandleT        hUlpSession;                    /**< ULP session handle for the session */
