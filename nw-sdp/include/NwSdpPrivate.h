@@ -102,7 +102,6 @@ typedef struct NwSdp
   NwGreStackHandleT             hGreStack;
   NwIpv4StackHandleT            hIpv4Stack;
   NwU32T                        greSd;
-  NwU16T                        port;
 } NwSdpT; 
 
 /**
@@ -116,6 +115,8 @@ typedef struct NwSdpFlowContext
   NwU32T                        egressIpv4Addr;                 /**< Egress Ip Address for this session */
   NwSdpT*                       pStack;                         /**< Pointer to the parent stack        */
   NwSdpUlpSessionHandleT        hUlpSession;                    /**< ULP session handle for the session */
+  struct NwSdpFlowContext       *otherDirection;
+  NwU16T                        port;
   struct NwSdpFlowContext       *next;
 } NwSdpFlowContextT;
 

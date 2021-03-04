@@ -385,6 +385,7 @@ nwSdpCreateFlow( NW_IN  NwSdpT* thiz,
 
     pFlowContext->ingressEndPoint = pCreateFlowInfo->ingressEndPoint;
     pFlowContext->egressEndPoint  = pCreateFlowInfo->egressEndPoint;
+    pFlowContext->otherDirection  = (NwSdpFlowContextT*) pCreateFlowInfo->hSdpSession;
 
     if(pFlowContext->egressEndPoint.flowType == NW_FLOW_TYPE_GTPU)
     {
@@ -465,11 +466,11 @@ nwSdpProcessIpv4DataIndication(NwSdpT* thiz,
       {
         NwGtpv1uUlpApiT           ulpReq;
         NW_ASSERT(pFlowContext->egressEndPoint.ipv4Addr != 0);
-        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR":%d", pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)), thiz->port);
+        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Sending IP PDU over GTPU teid 0x%x to "NW_IPV4_ADDR":%d", pFlowContext->egressEndPoint.flowKey.gtpuTeid, NW_IPV4_ADDR_FORMAT(htonl(pFlowContext->egressEndPoint.ipv4Addr)), pFlowContext->otherDirection->port);
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
-        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
+        ulpReq.apiInfo.sendtoInfo.port        = pFlowContext->otherDirection->port;
 
         rc = nwGtpv1uGpduMsgNew( thiz->hGtpv1uStack,
             pFlowContext->egressEndPoint.flowKey.gtpuTeid,      /* TEID                 */
@@ -577,7 +578,7 @@ nwSdpProcessGtpuDataIndication(NwSdpT* thiz,
         ulpReq.apiType                        = NW_GTPV1U_ULP_API_SEND_TPDU;
         ulpReq.apiInfo.sendtoInfo.teid        = pFlowContext->egressEndPoint.flowKey.gtpuTeid;
         ulpReq.apiInfo.sendtoInfo.ipAddr      = pFlowContext->egressEndPoint.ipv4Addr;
-        ulpReq.apiInfo.sendtoInfo.port        = thiz->port;
+        ulpReq.apiInfo.sendtoInfo.port        = 2152;
 
         if(thiz->hGtpv1uStack)
         {
@@ -626,8 +627,10 @@ NwSdpRcT nwSdpProcessGtpv1uStackReqCallback(NwGtpv1uUlpHandleT hUlp,
   {
     case NW_GTPV1U_ULP_API_RECV_TPDU:
       {
-        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received T-PDU from GTPU Stack");
-        rc = nwSdpProcessGtpuDataIndication(thiz, (NwSdpFlowContextT*)pUlpApi->apiInfo.recvMsgInfo.hUlpSession, pUlpApi->apiInfo.recvMsgInfo.hMsg);
+        NW_LOG(thiz, NW_LOG_LEVEL_DEBG, "Received T-PDU from GTPU Stack from port %d", pUlpApi->apiInfo.recvMsgInfo.peerPort);
+        NwSdpFlowContextT* flowContext = (NwSdpFlowContextT*)pUlpApi->apiInfo.recvMsgInfo.hUlpSession;
+        flowContext->port = pUlpApi->apiInfo.recvMsgInfo.peerPort;
+        rc = nwSdpProcessGtpuDataIndication(thiz, flowContext, pUlpApi->apiInfo.recvMsgInfo.hMsg);
       }
       break;
 
@@ -1293,7 +1296,6 @@ nwSdpProcessGtpuDataInd( NW_IN NwSdpHandleT hSdp,
 
   NW_ASSERT(thiz);
   NW_ENTER(thiz);
-  thiz->port = peerPort;
   rc = nwGtpv1uProcessUdpReq(thiz->hGtpv1uStack, udpData, udpDataLen, peerPort, peerIp);
   NW_LEAVE(thiz);
   return rc;

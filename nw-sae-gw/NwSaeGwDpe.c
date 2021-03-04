@@ -292,6 +292,7 @@ nwSaeGwDpeCreateIpv4GtpuFlow(NwSaeGwDpeT*   thiz,
                          NwU32T         teidEgress,
                          NwU32T         ipv4Egress,
                          NwU32T         ipv4Ingress,
+                         NwPtrT         otherDirection,
                          NwU32T         *phBearer)
 {
   NwRcT rc;
@@ -299,6 +300,7 @@ nwSaeGwDpeCreateIpv4GtpuFlow(NwSaeGwDpeT*   thiz,
 
   ulpReq.apiType                              = NW_SDP_ULP_API_CREATE_FLOW;
   ulpReq.apiInfo.createFlowInfo.hUlpSession   = (NwSdpUlpSessionHandleT) hSession;
+  ulpReq.apiInfo.createFlowInfo.hSdpSession   = otherDirection;
 
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowType                = NW_FLOW_TYPE_IPv4;
   ulpReq.apiInfo.createFlowInfo.ingressEndPoint.flowKey.ipv4Addr        = ipv4Ingress;

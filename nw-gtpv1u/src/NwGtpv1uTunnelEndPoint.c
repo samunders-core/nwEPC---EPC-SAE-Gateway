@@ -109,6 +109,8 @@ nwGtpTunnelEndPointDestroy(struct NwGtpv1uStack *pStack, NwGtpv1uTunnelEndPointT
 
 NwGtpv1uRcT
 nwGtpSessionSendMsgApiToUlpEntity(NwGtpv1uTunnelEndPointT* thiz,
+    NW_IN NwU16T peerPort,
+    NW_IN NwU32T peerIp,
     NwGtpv1uMsgT *pMsg)
 {
   NwGtpv1uRcT rc = NW_GTPV1U_OK;
@@ -117,6 +119,8 @@ nwGtpSessionSendMsgApiToUlpEntity(NwGtpv1uTunnelEndPointT* thiz,
   api.apiType                         = NW_GTPV1U_ULP_API_RECV_TPDU;
   api.apiInfo.recvMsgInfo.hUlpSession = thiz->hUlpSession;
   api.apiInfo.recvMsgInfo.teid        = thiz->teid;
+  api.apiInfo.recvMsgInfo.peerIp      = peerIp;
+  api.apiInfo.recvMsgInfo.peerPort    = peerPort;
   api.apiInfo.recvMsgInfo.hMsg        = (NwGtpv1uMsgHandleT)pMsg;
 
   NW_ASSERT(thiz->pStack->ulp.ulpReqCallback != NULL);
